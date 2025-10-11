@@ -1,6 +1,4 @@
 # app.py
-
-
 import os
 import re
 import math
@@ -23,22 +21,15 @@ except Exception:
     detect = None
 
 # Optional: for better ML classification (install transformers + torch)
-USE_TRANSFORMER_IF_AVAILABLE = True  # set True below if you want automatic attempt
+USE_TRANSFORMER_IF_AVAILABLE = False  # set True below if you want automatic attempt
 
-transformer_pipeline = None
 transformer_pipeline = None
 try:
     if USE_TRANSFORMER_IF_AVAILABLE:
         from transformers import pipeline
-        transformer_pipeline = pipeline(
-    "text-classification",
-    model="mrm8488/bert-tiny-finetuned-fake-news-detection"
-)
-
-        print("[INFO] Transformer model loaded successfully")
-except Exception as e:
+        transformer_pipeline = pipeline("text-classification", model="mrm8488/bert-small-finetuned-fake-news")
+except Exception:
     transformer_pipeline = None
-    print(f"[ERROR] Could not load transformer model: {e}")
 
 load_dotenv()
 
@@ -284,9 +275,7 @@ def analyze():
 def ping():
     return jsonify({"ok": True, "message": "TruthGuard backend running"}), 200
 
-if __name__ == "__main__":
-    print("[DEBUG] __main__ block running...")
+if __name__== "__main__":
     port = int(os.getenv("PORT", 5000))
     debug = os.getenv("FLASK_DEBUG", "1") == "1"
-    print(f"[DEBUG] Running Flask on port {port}, debug={debug}")
     app.run(host="0.0.0.0", port=port, debug=debug)
