@@ -1,993 +1,471 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TruthGuard - Fake News Detection</title>
-    <style>
-        /* CSS Reset and Base Styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
 
-        :root {
-            --primary: #2c3e50;
-            --secondary: #3498db;
-            --accent: #e74c3c;
-            --light: #ecf0f1;
-            --dark: #2c3e50;
-            --success: #2ecc71;
-            --warning: #f39c12;
-            --danger: #e74c3c;
-            --gray: #95a5a6;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
-        }
+    <title>TruthGuard | Fake News Detection</title>
 
-        body {
-            background-color: #f9f9f9;
-            color: #333;
-            line-height: 1.6;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        /* Header Styles */
-        header {
-            background-color: var(--primary);
-            color: white;
-            padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow);
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo-icon {
-            font-size: 1.8rem;
-            color: var(--secondary);
-        }
-
-        .logo-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-        }
-
-        nav a {
-            color: white;
-            text-decoration: none;
-            font-weight: 500;
-            transition: var(--transition);
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-        }
-
-        nav a:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .mobile-menu-btn {
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-        }
-
-        /* Hero Section */
-        .hero {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-            padding: 5rem 0;
-            text-align: center;
-        }
-
-        .hero-content {
-            max-width: 800px;
-            margin: 0 auto;
-        }
-
-        .hero h1 {
-            font-size: 3rem;
-            margin-bottom: 1.5rem;
-            line-height: 1.2;
-        }
-
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-
-        .cta-button {
-            display: inline-block;
-            background-color: var(--accent);
-            color: white;
-            padding: 0.8rem 2rem;
-            border-radius: 50px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 1.1rem;
-            transition: var(--transition);
-            border: none;
-            cursor: pointer;
-            box-shadow: var(--shadow);
-        }
-
-        .cta-button:hover {
-            background-color: #c0392b;
-            transform: translateY(-3px);
-        }
-
-        /* Features Section */
-        .features {
-            padding: 5rem 0;
-            background-color: white;
-        }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-
-        .section-title h2 {
-            font-size: 2.5rem;
-            color: var(--primary);
-            margin-bottom: 1rem;
-        }
-
-        .section-title p {
-            color: var(--gray);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
-
-        .feature-card {
-            background-color: white;
-            border-radius: 10px;
-            padding: 2rem;
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            text-align: center;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-10px);
-        }
-
-        .feature-icon {
-            font-size: 3rem;
-            color: var(--secondary);
-            margin-bottom: 1.5rem;
-        }
-
-        .feature-card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        /* Detection Section */
-        .detection {
-            padding: 5rem 0;
-            background-color: #f5f7fa;
-        }
-
-        .detection-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 3rem;
-            align-items: center;
-        }
-
-        .detection-form {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-        }
-
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .form-control {
-            width: 100%;
-            padding: 0.8rem 1rem;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: var(--transition);
-        }
-
-        .form-control:focus {
-            border-color: var(--secondary);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-        }
-
-        textarea.form-control {
-            min-height: 150px;
-            resize: vertical;
-        }
-
-        .detection-result {
-            background-color: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-            display: none;
-        }
-
-        .result-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .result-icon {
-            font-size: 2rem;
-            width: 60px;
-            height: 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-
-        .result-icon.true {
-            background-color: rgba(46, 204, 113, 0.2);
-            color: var(--success);
-        }
-
-        .result-icon.fake {
-            background-color: rgba(231, 76, 60, 0.2);
-            color: var(--danger);
-        }
-
-        .result-icon.uncertain {
-            background-color: rgba(243, 156, 18, 0.2);
-            color: var(--warning);
-        }
-
-        .result-title {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .result-details {
-            margin-bottom: 1.5rem;
-        }
-
-        .confidence-meter {
-            margin-bottom: 1.5rem;
-        }
-
-        .confidence-label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-        }
-
-        .confidence-bar {
-            height: 10px;
-            background-color: #eee;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-
-        .confidence-fill {
-            height: 100%;
-            border-radius: 5px;
-            transition: width 1s ease;
-        }
-
-        .confidence-fill.true {
-            background-color: var(--success);
-        }
-
-        .confidence-fill.fake {
-            background-color: var(--danger);
-        }
-
-        .confidence-fill.uncertain {
-            background-color: var(--warning);
-        }
-
-        .analysis-details {
-            margin-top: 1.5rem;
-        }
-
-        .analysis-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 0.8rem 0;
-            border-bottom: 1px solid #eee;
-        }
-
-        .analysis-item:last-child {
-            border-bottom: none;
-        }
-
-        /* Educational Section */
-        .educational {
-            padding: 5rem 0;
-            background-color: white;
-        }
-
-        .tips-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-        }
-
-        .tip-card {
-            background-color: #f5f7fa;
-            border-radius: 10px;
-            padding: 2rem;
-            transition: var(--transition);
-        }
-
-        .tip-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--shadow);
-        }
-
-        .tip-number {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            background-color: var(--secondary);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            margin-bottom: 1rem;
-        }
-
-        .tip-card h3 {
-            margin-bottom: 1rem;
-            color: var(--primary);
-        }
-
-        /* Statistics Section */
-        .statistics {
-            padding: 5rem 0;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            color: white;
-        }
-
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            text-align: center;
-        }
-
-        .stat-item h3 {
-            font-size: 3rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-item p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-
-        /* FAQ Section */
-        .faq {
-            padding: 5rem 0;
-            background-color: #f5f7fa;
-        }
-
-        .faq-item {
-            margin-bottom: 1rem;
-            background-color: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-        }
-
-        .faq-question {
-            padding: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .faq-answer {
-            padding: 0 1.5rem;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-
-        .faq-answer.active {
-            padding-bottom: 1.5rem;
-            max-height: 500px;
-        }
-
-        .faq-toggle {
-            font-size: 1.2rem;
-            transition: transform 0.3s ease;
-        }
-
-        .faq-toggle.active {
-            transform: rotate(45deg);
-        }
-
-        /* Footer */
-        footer {
-            background-color: var(--dark);
-            color: white;
-            padding: 3rem 0 1rem;
-        }
-
-        .footer-content {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .footer-column h3 {
-            margin-bottom: 1.5rem;
-            font-size: 1.2rem;
-        }
-
-        .footer-column ul {
-            list-style: none;
-        }
-
-        .footer-column ul li {
-            margin-bottom: 0.8rem;
-        }
-
-        .footer-column a {
-            color: #ddd;
-            text-decoration: none;
-            transition: var(--transition);
-        }
-
-        .footer-column a:hover {
-            color: white;
-        }
-
-        .social-links {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .social-link {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: var(--transition);
-        }
-
-        .social-link:hover {
-            background-color: var(--secondary);
-            transform: translateY(-3px);
-        }
-
-        .copyright {
-            text-align: center;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-            color: #aaa;
-            font-size: 0.9rem;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            .detection-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .hero h1 {
-                font-size: 2.5rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            nav ul {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                width: 100%;
-                background-color: var(--primary);
-                flex-direction: column;
-                padding: 1rem 0;
-                box-shadow: var(--shadow);
-            }
-            
-            nav ul.active {
-                display: flex;
-            }
-            
-            .mobile-menu-btn {
-                display: block;
-            }
-            
-            .hero h1 {
-                font-size: 2rem;
-            }
-            
-            .hero p {
-                font-size: 1rem;
-            }
-        }
-
-        /* Utility Classes */
-        .text-center {
-            text-align: center;
-        }
-
-        .mt-1 { margin-top: 1rem; }
-        .mt-2 { margin-top: 2rem; }
-        .mt-3 { margin-top: 3rem; }
-        .mb-1 { margin-bottom: 1rem; }
-        .mb-2 { margin-bottom: 2rem; }
-        .mb-3 { margin-bottom: 3rem; }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
-    <!-- Header -->
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <div class="logo-icon">🔍</div>
-                    <div class="logo-text">TruthGuard</div>
-                </div>
-                <nav>
-                    <button class="mobile-menu-btn">☰</button>
-                    <ul>
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#detection">Detection</a></li>
-                        <li><a href="#educational">Learn</a></li>
-                        <li><a href="#faq">FAQ</a></li>
-                        <li><a href="#about">About</a></li>
-                    </ul>
-                </nav>
-            </div>
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+
+        <div class="logo">
+            Truth<span>Guard</span>
         </div>
+
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#detect">Detection</a>
+            <a href="#how-it-works">How It Works</a>
+            <a href="#about">About</a>
+        </nav>
+
+        <a href="#detect" class="nav-button">
+            Try Detector
+        </a>
+
     </header>
 
-    <!-- Hero Section -->
+
+    <!-- HERO -->
     <section class="hero" id="home">
-        <div class="container">
-            <div class="hero-content">
-                <h1>Detect Fake News with AI-Powered Analysis</h1>
-                <p>TruthGuard uses advanced machine learning algorithms to analyze news content and determine its credibility. Protect yourself from misinformation with our reliable detection tool.</p>
-                <a href="#detection" class="cta-button">Analyze News Now</a>
+
+        <div class="hero-left">
+
+            <div class="hero-label">
+                <span></span>
+                AI-POWERED NEWS VERIFICATION
             </div>
+
+            <h1>
+                Don't just read it.
+                <strong>Verify it.</strong>
+            </h1>
+
+            <p>
+                TruthGuard uses machine learning and text analysis
+                to identify potentially misleading or fake news
+                before it spreads.
+            </p>
+
+            <div class="hero-buttons">
+
+                <a href="#detect" class="primary-btn">
+                    Analyze News →
+                </a>
+
+                <a href="#how-it-works" class="secondary-btn">
+                    How it works
+                </a>
+
+            </div>
+
+            <div class="hero-note">
+                ✓ Simple &nbsp;&nbsp; ✓ Fast &nbsp;&nbsp; ✓ ML Based
+            </div>
+
         </div>
+
+
+        <!-- HERO CARD -->
+        <div class="hero-right">
+
+            <div class="analysis-card">
+
+                <div class="card-top">
+                    <span class="live-dot"></span>
+                    TruthGuard Analysis
+                    <span class="card-menu">•••</span>
+                </div>
+
+                <div class="news-preview">
+
+                    <span class="category">NEWS ARTICLE</span>
+
+                    <h3>
+                        Scientists discover a new method
+                        to reduce plastic waste...
+                    </h3>
+
+                    <p>
+                        Example article preview used to demonstrate
+                        the TruthGuard analysis process.
+                    </p>
+
+                </div>
+
+                <div class="analysis-line">
+                    <span>Analysis Progress</span>
+                    <span>82%</span>
+                </div>
+
+                <div class="progress">
+                    <div></div>
+                </div>
+
+                <div class="mini-results">
+
+                    <div>
+                        <span>Source</span>
+                        <strong>84%</strong>
+                    </div>
+
+                    <div>
+                        <span>Language</span>
+                        <strong>91%</strong>
+                    </div>
+
+                    <div>
+                        <span>Bias</span>
+                        <strong>76%</strong>
+                    </div>
+
+                </div>
+
+                <div class="verified">
+                    <span>✓</span>
+                    Analysis completed
+                </div>
+
+            </div>
+
+        </div>
+
     </section>
 
-    <!-- Features Section -->
-    <section class="features">
-        <div class="container">
-            <div class="section-title">
-                <h2>Why Choose TruthGuard?</h2>
-                <p>Our platform combines cutting-edge technology with user-friendly design to help you identify misinformation.</p>
-            </div>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">🤖</div>
-                    <h3>AI-Powered Analysis</h3>
-                    <p>Our advanced algorithms analyze multiple factors to determine news credibility with high accuracy.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <h3>Real-Time Results</h3>
-                    <p>Get instant analysis and detailed reports on news articles, social media posts, and more.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🛡</div>
-                    <h3>Trusted by Thousands</h3>
-                    <p>Join our community of informed users who rely on TruthGuard to navigate the information landscape.</p>
-                </div>
-            </div>
+
+    <!-- STATS -->
+    <section class="stats">
+
+        <div class="stat">
+            <strong>01</strong>
+            <span>ML Model</span>
         </div>
+
+        <div class="stat">
+            <strong>04</strong>
+            <span>Analysis Factors</span>
+        </div>
+
+        <div class="stat">
+            <strong>02</strong>
+            <span>Prediction Classes</span>
+        </div>
+
+        <div class="stat">
+            <strong>24/7</strong>
+            <span>Available</span>
+        </div>
+
     </section>
 
-    <!-- Detection Section -->
-    <section class="detection" id="detection">
-        <div class="container">
-            <div class="section-title">
-                <h2>Detect Fake News</h2>
-                <p>Paste the text of a news article or social media post below to analyze its credibility.</p>
+
+    <!-- DETECTION -->
+    <section class="detect-section" id="detect">
+
+        <div class="section-heading">
+
+            <div class="section-label">
+                NEWS DETECTOR
             </div>
-            <div class="detection-container">
-                <div class="detection-form">
-                    <div class="form-group">
-                        <label for="news-text">News Text</label>
-                        <textarea id="news-text" class="form-control" placeholder="Paste the news content here..."></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="news-url">Or Enter URL (Optional)</label>
-                        <input type="url" id="news-url" class="form-control" placeholder="https://example.com/news-article">
-                    </div>
-                    <button id="analyze-btn" class="cta-button" style="width: 100%;">Analyze Content</button>
-                </div>
-                <div class="detection-result" id="result-container">
-                    <div class="result-header">
-                        <div class="result-icon" id="result-icon">📊</div>
-                        <div class="result-title" id="result-title">Analysis Result</div>
-                    </div>
-                    <div class="result-details" id="result-details">
-                        Our analysis indicates the credibility of this content.
-                    </div>
-                    <div class="confidence-meter">
-                        <div class="confidence-label">
-                            <span>Confidence Level</span>
-                            <span id="confidence-value">0%</span>
-                        </div>
-                        <div class="confidence-bar">
-                            <div class="confidence-fill" id="confidence-fill" style="width: 0%"></div>
-                        </div>
-                    </div>
-                    <div class="analysis-details">
-                        <div class="analysis-item">
-                            <span>Source Reliability</span>
-                            <span id="source-score">-</span>
-                        </div>
-                        <div class="analysis-item">
-                            <span>Language Analysis</span>
-                            <span id="language-score">-</span>
-                        </div>
-                        <div class="analysis-item">
-                            <span>Fact-Checking</span>
-                            <span id="fact-score">-</span>
-                        </div>
-                        <div class="analysis-item">
-                            <span>Bias Detection</span>
-                            <span id="bias-score">-</span>
-                        </div>
-                    </div>
-                    <button id="new-analysis" class="cta-button mt-2" style="width: 100%; background-color: var(--gray);">Analyze Another</button>
-                </div>
-            </div>
+
+            <h2>
+                Is this news <span>real or fake?</span>
+            </h2>
+
+            <p>
+                Paste a headline or article below and let our
+                machine learning model analyze it.
+            </p>
+
         </div>
+
+
+        <div class="detector-layout">
+
+            <!-- INPUT -->
+            <div class="detector-box">
+
+                <div class="box-heading">
+
+                    <div>
+                        <h3>News Content</h3>
+                        <p>Enter the text you want to analyze.</p>
+                    </div>
+
+                    <span class="step-tag">STEP 01</span>
+
+                </div>
+
+                <textarea
+                    id="newsText"
+                    placeholder="Paste your news headline or article here..."
+                ></textarea>
+
+                <div class="input-bottom">
+
+                    <span id="charCount">
+                        0 characters
+                    </span>
+
+                    <span>
+                        Minimum recommended: 20 characters
+                    </span>
+
+                </div>
+
+                <button id="analyzeBtn" class="analyze-btn">
+                    Analyze News →
+                </button>
+
+                <p id="errorMessage" class="error-message"></p>
+
+            </div>
+
+
+            <!-- SIDE INFO -->
+            <div class="detector-info">
+
+                <div class="info-card">
+
+                    <span class="info-icon">01</span>
+
+                    <h3>Text Analysis</h3>
+
+                    <p>
+                        The model examines patterns and language
+                        used in the submitted news.
+                    </p>
+
+                </div>
+
+
+                <div class="info-card">
+
+                    <span class="info-icon">02</span>
+
+                    <h3>ML Prediction</h3>
+
+                    <p>
+                        The trained classification model predicts
+                        whether the content is real or fake.
+                    </p>
+
+                </div>
+
+
+                <div class="info-card">
+
+                    <span class="info-icon">03</span>
+
+                    <h3>Confidence Score</h3>
+
+                    <p>
+                        The result includes a confidence value
+                        to make the prediction easier to understand.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- RESULT -->
+        <div class="result-box" id="resultBox">
+
+            <div class="result-top">
+
+                <div>
+                    <div class="section-label">
+                        ANALYSIS RESULT
+                    </div>
+
+                    <h3 id="prediction">
+                        --
+                    </h3>
+                </div>
+
+                <div class="confidence">
+                    <span>Confidence</span>
+                    <strong id="confidence">--%</strong>
+                </div>
+
+            </div>
+
+
+            <div class="result-details">
+
+                <div class="score">
+                    <span>Source Reliability</span>
+                    <strong id="sourceScore">--%</strong>
+                </div>
+
+                <div class="score">
+                    <span>Language Analysis</span>
+                    <strong id="languageScore">--%</strong>
+                </div>
+
+                <div class="score">
+                    <span>Fact Checking</span>
+                    <strong id="factScore">--%</strong>
+                </div>
+
+                <div class="score">
+                    <span>Bias Detection</span>
+                    <strong id="biasScore">--%</strong>
+                </div>
+
+            </div>
+
+        </div>
+
     </section>
 
-    <!-- Educational Section -->
-    <section class="educational" id="educational">
-        <div class="container">
-            <div class="section-title">
-                <h2>How to Spot Fake News</h2>
-                <p>Learn these essential tips to identify misinformation and protect yourself online.</p>
+
+    <!-- HOW IT WORKS -->
+    <section class="how-section" id="how-it-works">
+
+        <div class="section-heading">
+
+            <div class="section-label">
+                HOW IT WORKS
             </div>
-            <div class="tips-grid">
-                <div class="tip-card">
-                    <div class="tip-number">1</div>
-                    <h3>Check the Source</h3>
-                    <p>Verify the credibility of the website or publication. Look for established, reputable sources with transparent editorial processes.</p>
-                </div>
-                <div class="tip-card">
-                    <div class="tip-number">2</div>
-                    <h3>Examine the URL</h3>
-                    <p>Fake news sites often use URLs that mimic legitimate sources. Look for slight misspellings or unusual domain extensions.</p>
-                </div>
-                <div class="tip-card">
-                    <div class="tip-number">3</div>
-                    <h3>Analyze the Writing</h3>
-                    <p>Poor grammar, excessive capitalization, and dramatic language are common in fake news. Professional journalism maintains standards.</p>
-                </div>
-                <div class="tip-card">
-                    <div class="tip-number">4</div>
-                    <h3>Verify Images</h3>
-                    <p>Use reverse image search to check if photos have been altered or used in different contexts than originally intended.</p>
-                </div>
-                <div class="tip-card">
-                    <div class="tip-number">5</div>
-                    <h3>Check the Date</h3>
-                    <p>Sometimes old news is repackaged as current events. Verify publication dates to ensure the information is timely.</p>
-                </div>
-                <div class="tip-card">
-                    <div class="tip-number">6</div>
-                    <h3>Consult Fact-Checkers</h3>
-                    <p>Use established fact-checking organizations like Snopes, FactCheck.org, or PolitiFact to verify suspicious claims.</p>
-                </div>
-            </div>
+
+            <h2>
+                From news to <span>insight.</span>
+            </h2>
+
+            <p>
+                Three simple steps are used to generate a prediction.
+            </p>
+
         </div>
+
+
+        <div class="steps">
+
+            <div class="step">
+
+                <div class="step-top">
+                    <span>01</span>
+                    INPUT
+                </div>
+
+                <h3>Enter the News</h3>
+
+                <p>
+                    Add a headline or article that you want
+                    TruthGuard to examine.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-top">
+                    <span>02</span>
+                    ANALYSIS
+                </div>
+
+                <h3>Process the Text</h3>
+
+                <p>
+                    The text is processed and passed through
+                    the machine learning pipeline.
+                </p>
+
+            </div>
+
+
+            <div class="step">
+
+                <div class="step-top">
+                    <span>03</span>
+                    RESULT
+                </div>
+
+                <h3>Get Prediction</h3>
+
+                <p>
+                    The system returns a prediction and
+                    confidence score.
+                </p>
+
+            </div>
+
+        </div>
+
     </section>
 
-    <!-- Statistics Section -->
-    <section class="statistics">
-        <div class="container">
-            <div class="section-title">
-                <h2>Fake News By The Numbers</h2>
-                <p>Understanding the scale of the misinformation problem</p>
+
+    <!-- ABOUT -->
+    <section class="about-section" id="about">
+
+        <div class="about-box">
+
+            <div class="about-left">
+
+                <div class="section-label">
+                    ABOUT TRUTHGUARD
+                </div>
+
+                <h2>
+                    Technology for a
+                    <span>more informed web.</span>
+                </h2>
+
             </div>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <h3>67%</h3>
-                    <p>of Americans encounter fake news regularly</p>
-                </div>
-                <div class="stat-item">
-                    <h3>23%</h3>
-                    <p>have shared a fake news story unknowingly</p>
-                </div>
-                <div class="stat-item">
-                    <h3>58%</h3>
-                    <p>believe fake news causes confusion about basic facts</p>
-                </div>
-                <div class="stat-item">
-                    <h3>42%</h3>
-                    <p>have difficulty distinguishing real from fake news</p>
-                </div>
+
+
+            <div class="about-right">
+
+                <p>
+                    TruthGuard is a student-built machine learning
+                    project focused on fake news detection.
+                </p>
+
+                <p>
+                    It demonstrates how natural language processing,
+                    text classification and machine learning can be
+                    combined to analyze news content.
+                </p>
+
             </div>
+
         </div>
+
     </section>
 
-    <!-- FAQ Section -->
-    <section class="faq" id="faq">
-        <div class="container">
-            <div class="section-title">
-                <h2>Frequently Asked Questions</h2>
-                <p>Find answers to common questions about our fake news detection service.</p>
-            </div>
-            <div class="faq-list">
-                <div class="faq-item">
-                    <div class="faq-question">
-                        How accurate is TruthGuard's analysis?
-                        <span class="faq-toggle">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>TruthGuard uses advanced machine learning models trained on thousands of verified news articles and known fake news stories. Our current accuracy rate is approximately 92% based on independent testing. However, no automated system is perfect, and we recommend using our analysis as one tool in your verification process.</p>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">
-                        What types of content can I analyze?
-                        <span class="faq-toggle">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>You can analyze news articles, social media posts, blog content, and any other text-based information. For best results, provide complete articles rather than short excerpts. Our system works with content in multiple languages, with the highest accuracy for English-language content.</p>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">
-                        Is my data stored when I use TruthGuard?
-                        <span class="faq-toggle">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>We take your privacy seriously. Analysis requests are processed anonymously, and we do not store personally identifiable information. Content analyzed may be stored temporarily to improve our algorithms but is anonymized and aggregated with other data.</p>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">
-                        How does the detection algorithm work?
-                        <span class="faq-toggle">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Our algorithm analyzes multiple factors including source credibility, writing style, emotional language, factual claims, and cross-references with known fact-checked information. The system uses natural language processing and machine learning to identify patterns associated with misinformation.</p>
-                    </div>
-                </div>
-                <div class="faq-item">
-                    <div class="faq-question">
-                        Can I use TruthGuard for commercial purposes?
-                        <span class="faq-toggle">+</span>
-                    </div>
-                    <div class="faq-answer">
-                        <p>Yes, we offer commercial licenses for organizations that need to verify content at scale. Please contact our business team for pricing and implementation details. For individual and educational use, our basic service remains free.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
 
-    <!-- Footer -->
-    <footer id="about">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <h3>TruthGuard</h3>
-                    <p>Fighting misinformation with advanced AI technology. Our mission is to create a more informed digital society.</p>
-                    <div class="social-links">
-                        <a href="#" class="social-link">f</a>
-                        <a href="#" class="social-link">t</a>
-                        <a href="#" class="social-link">in</a>
-                    </div>
-                </div>
-                <div class="footer-column">
-                    <h3>Quick Links</h3>
-                    <ul>
-                        <li><a href="#home">Home</a></li>
-                        <li><a href="#detection">Detection Tool</a></li>
-                        <li><a href="#educational">Educational Resources</a></li>
-                        <li><a href="#faq">FAQ</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Resources</h3>
-                    <ul>
-                        <li><a href="#">Fact-Checking Partners</a></li>
-                        <li><a href="#">Research Papers</a></li>
-                        <li><a href="#">Media Kit</a></li>
-                        <li><a href="#">API Documentation</a></li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Contact Us</h3>
-                    <ul>
-                        <li>Email: info@truthguard.com</li>
-                        <li>Phone: +1 (555) 123-4567</li>
-                        <li>Address: 123 Innovation Dr, Tech City</li>
-                    </ul>
-                </div>
-            </div>
-            <div class="copyright">
-                <p>&copy; 2023 TruthGuard. All rights reserved.</p>
-            </div>
+    <!-- FOOTER -->
+    <footer>
+
+        <div class="footer-logo">
+            Truth<span>Guard</span>
         </div>
+
+        <p>
+            Fake News Detection using Machine Learning
+        </p>
+
+        <p class="copyright">
+            © 2026 TruthGuard. Academic Project.
+        </p>
+
     </footer>
 
-    <script>
-        // Mobile Menu Toggle
-        document.querySelector('.mobile-menu-btn').addEventListener('click', function() {
-            document.querySelector('nav ul').classList.toggle('active');
-        });
 
-        // FAQ Toggle
-        document.querySelectorAll('.faq-question').forEach(question => {
-            question.addEventListener('click', () => {
-                const answer = question.nextElementSibling;
-                const toggle = question.querySelector('.faq-toggle');
-                
-                answer.classList.toggle('active');
-                toggle.classList.toggle('active');
-            });
-        });
+    <script src="script.js"></script>
 
-        // Fake News Detection Logic
-        document.getElementById('analyze-btn').addEventListener('click', function() {
-            const newsText = document.getElementById('news-text').value.trim();
-            const resultContainer = document.getElementById('result-container');
-            
-            if (!newsText) {
-                alert('Please enter some news text to analyze.');
-                return;
-            }
-            
-            // Show loading state
-            resultContainer.style.display = 'block';
-            document.getElementById('result-icon').textContent = '⏳';
-            document.getElementById('result-title').textContent = 'Analyzing...';
-            document.getElementById('result-details').textContent = 'Please wait while we analyze the content.';
-            document.getElementById('confidence-value').textContent = '0%';
-            document.getElementById('confidence-fill').style.width = '0%';
-            
-            // Simulate analysis with timeout
-            // Remove setTimeout entirely, and replace with this code inside 'analyze-btn' click handler:
-
-(async () => {
-    const newsText = document.getElementById('news-text').value.trim();
-    const newsUrl = document.getElementById('news-url').value.trim();
-
-    try {
-        const response = await fetch('http://127.0.0.1:5000/api/analyze', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: newsText, url: newsUrl })
-        });
-        const data = await response.json();
-
-        let icon, colorClass;
-        if (data.label === "Likely Credible") {
-            icon = "✅";
-            colorClass = "true";
-        } else if (data.label === "Uncertain") {
-            icon = "⚠";
-            colorClass = "uncertain";
-        } else {
-            icon = "❌";
-            colorClass = "fake";
-        }
-        document.getElementById('result-icon').textContent = icon;
-        document.getElementById('result-icon').className = "result-icon " + colorClass;
-        document.getElementById('result-title').textContent = data.label;
-        document.getElementById('result-details').textContent = data.extracted_text_snippet || '';
-        document.getElementById('confidence-value').textContent = data.confidence + "%";
-        document.getElementById('confidence-fill').style.width = data.confidence + "%";
-        document.getElementById('confidence-fill').className = "confidence-fill " + colorClass;
-        document.getElementById('source-score').textContent = data.scores.source + "%";
-        document.getElementById('language-score').textContent = data.scores.language + "%";
-        document.getElementById('fact-score').textContent = data.scores.fact + "%";
-        document.getElementById('bias-score').textContent = data.scores.claim + "%";
-    } catch (e) {
-        document.getElementById('result-title').textContent = "Error";
-        document.getElementById('result-details').textContent = "Could not analyze. Check backend connectivity.";
-        document.getElementById('result-icon').textContent = "❌";
-        document.getElementById('confidence-value').textContent = "0%";
-        document.getElementById('confidence-fill').style.width = "0%";
-    }
-})();
-
-        });
-
-        // New Analysis Button
-        document.getElementById('new-analysis').addEventListener('click', function() {
-            document.getElementById('news-text').value = '';
-            document.getElementById('news-url').value = '';
-            document.getElementById('result-container').style.display = 'none';
-        });
-
-        // Smooth scrolling for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                const targetId = this.getAttribute('href');
-                if (targetId === '#') return;
-                
-                const targetElement = document.querySelector(targetId);
-                if (targetElement) {
-                    window.scrollTo({
-                        top: targetElement.offsetTop - 80,
-                        behavior: 'smooth'
-                    });
-                    
-                    // Close mobile menu if open
-                    document.querySelector('nav ul').classList.remove('active');
-                }
-            });
-        });
-    </script>
 </body>
+
 </html>
